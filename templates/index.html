@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Label Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 20px;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="number"], input[type="range"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-top: 6px;
+            margin-bottom: 16px;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: red;
+            margin-bottom: 10px;
+        }
+        .preview-label {
+            border: 1px solid #000;
+            width: 48.5mm;
+            height: 25.4mm;
+            box-sizing: border-box;
+            margin-bottom: 20px; /* Adjust to add space between the labels and dividers */
+        }
+        .label-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10mm; /* Adjust gap for spacing between labels */
+        }
+        .label-divider {
+            width: 100%;
+            border-top: 2px solid #000;
+            margin: 5mm 0; /* Adjust the space between divider lines */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Label Generator</h2>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+        <form method="post">
+            <div class="input-group">
+                <label for="num_sets">Number of Sets:</label>
+                <input type="number" id="num_sets" name="num_sets" required>
+            </div>
+            <div id="sets"></div>
+            <input type="submit" value="Generate Labels">
+        </form>
+        <div id="preview" class="label-container"></div>
+    </div>
+    <script>
+        document.getElementById('num_sets').addEventListener('input', function() {
+            const numSets = parseInt(this.value);
+            const setsDiv = document.getElementById('sets');
+            setsDiv.innerHTML = '';
+            for (let i = 0; i < numSets; i++) {
+                const setDiv = document.createElement('div');
+                setDiv.classList.add('input-group');
+                setDiv.innerHTML = `
+                    <h3>Set ${i + 1}</h3>
+                    <label for="brand_${i}">Brand (Set ${i + 1}):</label>
+                    <input type="text" id="brand_${i}" name="brand_${i}" required>
+                    <label for="article_${i}">Article (Set ${i + 1}):</label>
+                    <input type="text" id="article_${i}" name="article_${i}" required>
+                    <label for="mrp_${i}">MRP (Set ${i + 1}):</label>
+                    <input type="text" id="mrp_${i}" name="mrp_${i}" required>
+                    <label for="code_${i}">Code (Set ${i + 1}):</label>
+                    <input type="text" id="code_${i}" name="code_${i}" required>
+                    <label for="purchased_from_${i}">Purchased From (Set ${i + 1}):</label>
+                    <input type="text" id="purchased_from_${i}" name="purchased_from_${i}" required>
+                    <label for="shop_${i}">Shop (Set ${i + 1}):</label>
+                    <input type="text" id="shop_${i}" name="shop_${i}" required>
+                    <label for="num_labels_${i}">Number of Labels (Set ${i + 1}):</label>
+                    <input type="number" id="num_labels_${i}" name="num_labels_${i}" required>
+                    <label for="brand_font_size_${i}">Brand Font Size (Set ${i + 1}):</label>
+                    <input type="range" id="brand_font_size_${i}" name="brand_font_size_${i}" min="10" max="30" value="14">
+                    <label for="mrp_font_size_${i}">MRP Font Size (Set ${i + 1}):</label>
+                    <input type="range" id="mrp_font_size_${i}" name="mrp_font_size_${i}" min="10" max="30" value="14">
+                `;
+                setsDiv.appendChild(setDiv);
+
+                setDiv.querySelectorAll('input[type="text"], input[type="range"], input[type="number"]').forEach(input => {
+                    input.addEventListener('input', updatePreview);
+                });
+            }
+        });
+
+        function updatePreview() {
+            const numSets = parseInt(document.getElementById('num_sets').value);
+            const previewDiv = document.getElementById('preview');
+            previewDiv.innerHTML = '';
+            for (let i = 0; i < numSets; i++) {
+                const brand = document.getElementById(`brand_${i}`).value;
+                const article = document.getElementById(`article_${i}`).value;
+                const mrp = document.getElementById(`mrp_${i}`).value;
+                const code = document.getElementById(`code_${i}`).value;
+                const purchased_from = document.getElementById(`purchased_from_${i}`).value;
+                const shop = document.getElementById(`shop_${i}`).value;
+                const brandFontSize = document.getElementById(`brand_font_size_${i}`).value;
+                const mrpFontSize = document.getElementById(`mrp_font_size_${i}`).value;
+
+                const labelDiv = document.createElement('div');
+                labelDiv.classList.add('preview-label');
+                labelDiv.innerHTML = `
+                    <h3 style="font-size: ${brandFontSize}px;">Brand: ${brand}</h3>
+                    <p>Article: ${article}</p>
+                    <h3 style="font-size: ${mrpFontSize}px;">MRP: ${mrp}</h3>
+                    <p>Code: ${code}</p>
+                    <p>Purchased From: ${purchased_from}</p>
+                    <p>Shop: ${shop}</p>
+                `;
+
+                // Add label and dividers to the preview container
+                previewDiv.appendChild(labelDiv);
+                if (i < numSets - 1) { // Don't add dividers after the last label
+                    const divider1 = document.createElement('div');
+                    divider1.classList.add('label-divider');
+                    const divider2 = document.createElement('div');
+                    divider2.classList.add('label-divider');
+                    previewDiv.appendChild(divider1);
+                    previewDiv.appendChild(divider2);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
