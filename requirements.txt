@@ -1,0 +1,5 @@
+instabot
+pandas
+openpyxl
+flask
+reportlab
